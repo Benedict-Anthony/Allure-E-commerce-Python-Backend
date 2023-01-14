@@ -1,0 +1,14 @@
+env
+env/
+*__pycache__.py
+db.sqlite3
+uploads
+
+.history
+*.log
+*.pot
+*.pyc
+__pycache__/
+
+
+
