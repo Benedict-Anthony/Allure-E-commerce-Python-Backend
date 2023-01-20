@@ -13,9 +13,11 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class ProductManager(models.Manager):
 
-    
+class ProductQueryset(models.QuerySet):
+    def is_available(self):
+        return self.filter(available=True)
+class ProductManager(models.Manager):
     def search(self, query):
         if query:
             return self.filter(Q(name__icontains=query) | Q(slug__icontains=query))

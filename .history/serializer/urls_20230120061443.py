@@ -1,7 +1,8 @@
 from django.urls import path
 
 from lesson.views import LessonView
-from products.views import CategoryListView, ProductListView 
+from products.views import CategoryListView, ProductListView
+from . import views  
 from users.views import UserCreateView
     
 urlpatterns = [

@@ -21,5 +21,3 @@ class UserCreateView(APIView):
             return Response({"error":str(exec)})
        
         return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
-    
-    

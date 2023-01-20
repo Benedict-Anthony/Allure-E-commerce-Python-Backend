@@ -4,9 +4,7 @@ from lesson.models import Lesson
 from rest_framework import status
 from django.db.models import Q
 
-from .serializers import LessonSerializer
-from products.serializer import ProductSerializer
-
+from serializer.serializer import LessonSerializer, ProductSerializer
 
 
 class LessonView(APIView):

@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Q
 from users.models import Address
 from PIL import Image
 from io import BytesIO
@@ -12,20 +11,15 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 class ProductManager(models.Manager):
-
-    
-    def search(self, query):
-        if query:
-            return self.filter(Q(name__icontains=query) | Q(slug__icontains=query))
-        return []
-    
-    
     def get_queryset(self):
         return super().get_queryset().filter(available=True)
     
 class Products(models.Model):
+    class Meta:
+        verbose_name_plural = "Products"
+        ordering =("-created",)
     name = models.CharField(max_length=50)
     price = models.FloatField()
     discount = models.FloatField(blank=True, null=True)
@@ -40,8 +34,7 @@ class Products(models.Model):
     update = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True)
     
-    objects = models.Manager()
-    available_products = ProductManager()
+    objects = ProductManager()
     
     def __str__(self):
         return self.name
@@ -97,11 +90,19 @@ class Products(models.Model):
         thumbnail = File(thumb_io, name=image.name)
         return thumbnail
       
-    class Meta:
-        verbose_name_plural = "Products"
-        ordering =("-created",)
-   
+
+
     
+    
+    class Meta:
+        verbose_name_plural = "Address Details"
+    
+    def __str__(self):
+        return self.state
+    
+    
+        
+        
     def __str__(self):
         return self.name
 

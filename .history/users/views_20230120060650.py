@@ -18,8 +18,8 @@ class UserCreateView(APIView):
         try:
             serilizer.save()
         except Exception as exec:
+            # print(exec.)
+            # error
             return Response({"error":str(exec)})
        
         return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
-    
-    

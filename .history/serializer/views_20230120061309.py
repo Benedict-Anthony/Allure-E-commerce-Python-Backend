@@ -1,11 +1,15 @@
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
+from .serializer import CategorySerializer, LessonSerializer, ProductSerializer
+from lesson.models import Lesson, Asset, Instruction
 from products.models import Category, Products
 from rest_framework import status
 from django.db.models import Q
 
-from products.serializer import CategorySerializer, ProductSerializer
+
+    
     
 class ProductListView(APIView):
     serializer_class = ProductSerializer
@@ -51,4 +55,4 @@ class CategoryListView(ListAPIView):
         queryset = Category.objects.all().order_by("-id")
         
         return queryset
-# Create your views here.
+    

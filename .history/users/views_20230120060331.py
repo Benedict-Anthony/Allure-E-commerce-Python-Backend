@@ -14,12 +14,11 @@ class UserCreateView(APIView):
     
     def post(self, request, *args, **kwargs):
         serilizer = self.serializer_class(data=request.data)
-        serilizer.is_valid(raise_exception=True)
         try:
+            serilizer.is_valid(raise_exception=True)
             serilizer.save()
         except Exception as exec:
-            return Response({"error":str(exec)})
+            # print(exec)
+            return Response({"error":exec})
        
         return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
-    
-    

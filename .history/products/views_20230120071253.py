@@ -6,6 +6,11 @@ from rest_framework import status
 from django.db.models import Q
 
 from products.serializer import CategorySerializer, ProductSerializer
+
+# from serializer.serializer import CategorySerializer, ProductSerializer
+
+
+    
     
 class ProductListView(APIView):
     serializer_class = ProductSerializer

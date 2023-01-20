@@ -36,10 +36,11 @@ class ProductListView(APIView):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get("slug", None)
         category = kwargs.get("category", None)
+        params = kwargs.get("params")
 
         if slug:
             try:
-                queryset = Products.objects.get(slug=slug)
+                queryset = Products.available_products.get(slug=slug)
                 serializer = self.serializer_class(queryset)  
                 return Response(serializer.data)
             except Products.DoesNotExist:
@@ -47,16 +48,18 @@ class ProductListView(APIView):
         
         if category:
             try:
-                product = Products.objects.get(slug=category)
-                queryset = Products.objects.filter(category__name=product.category.name).exclude(slug=product.slug)
+                product = Products.available_products.get(slug=category)
+                queryset = Products.available_products.filter(category__name=product.category.name).exclude(slug=product.slug)
                 serializer = self.serializer_class(queryset, many=True)
                 return Response(serializer.data)
             except Products.DoesNotExist:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             except:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        queryset = Products.objects.all().order_by("-created",)
+        if params:
+            product = Products.available_products.search("face")
+            print(product)
+        queryset = Products.available_products.all().order_by("-created",)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     

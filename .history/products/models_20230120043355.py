@@ -12,9 +12,8 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 class ProductManager(models.Manager):
-
     
     def search(self, query):
         if query:

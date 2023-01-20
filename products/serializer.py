@@ -1,13 +1,6 @@
-from dataclasses import fields
+
 from rest_framework import serializers
-from lesson.models import Lesson, Asset, Instruction
 from products.models import Category, Products
-
-
-class AssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Products
-        fields =["name"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,39 +18,8 @@ class CategorySerializer(serializers.ModelSerializer):
         
         return value
         
-        
 
-class InstructionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Instruction
-        fields = "__all__"
 
-class LessonSerializer(serializers.ModelSerializer):
-    assets = AssetSerializer(many=True)
-    instructions = InstructionSerializer(many=True)
-    class Meta:
-        model = Lesson
-        fields = [ "id",
-                    "title",
-                    "thumbnail_url",
-                    "image_url",
-                    "description",
-                    "level",
-                    "type",
-                    "created",
-                    "updated",
-                    "slug",
-                    "assets",
-                    "instructions"
-                ]
-
-    
-    def get_topics(self, obj):
-        try:
-            return obj.topics
-        except:
-            return ""
-        
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     # assets = AssetSerializer()

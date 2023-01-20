@@ -1,11 +1,35 @@
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
+from .serializer import CategorySerializer, LessonSerializer, ProductSerializer
+from lesson.models import Lesson, Asset, Instruction
 from products.models import Category, Products
 from rest_framework import status
 from django.db.models import Q
 
-from products.serializer import CategorySerializer, ProductSerializer
+class LessonView(APIView):
+    serializer_class = LessonSerializer
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get("slug", None)
+        assets = kwargs.get("assets")
+        if slug:
+            queryset = Lesson.objects.get(slug=slug)
+            serializer = self.serializer_class(queryset)
+            return Response(serializer.data)
+
+
+        if assets:
+            try:
+                queryset = Lesson.objects.get(slug=assets)
+                serializer = ProductSerializer(queryset.assets.all(), many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except:
+                return Response({"data":404}, status=status.HTTP_404_NOT_FOUND)
+        queryset = Lesson.objects.all().order_by("-created")
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     
 class ProductListView(APIView):
     serializer_class = ProductSerializer
@@ -20,8 +44,6 @@ class ProductListView(APIView):
                 serializer = self.serializer_class(queryset)  
                 return Response(serializer.data)
             except Products.DoesNotExist:
-                queryset = Products.available_products.get(slug=slug)
-                serializer = self.serializer_class(queryset)  
                 return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
         
         if category:
@@ -36,8 +58,8 @@ class ProductListView(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         if params:
             products = Products.available_products.search(params)
-            serializer = self.serializer_class(products, many=True).data
-            return Response(serializer, status=status.HTTP_200_OK)
+            serializer = self.serializer_class(product, many=True).data
+            return Response(products, status=status.HTTP_200_OK)
         queryset = Products.available_products.all().order_by("-created",)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -51,4 +73,4 @@ class CategoryListView(ListAPIView):
         queryset = Category.objects.all().order_by("-id")
         
         return queryset
-# Create your views here.
+    

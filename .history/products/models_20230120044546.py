@@ -13,17 +13,23 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class ProductManager(models.Manager):
 
-    
+class ProductQueryset(models.QuerySet):
+    def is_available(self):
+        return self.filter(available=True)
+
+
+class ProductManager(models.Manager):
+    def is_available(self):
+            return self.filter(available=True)
     def search(self, query):
         if query:
             return self.filter(Q(name__icontains=query) | Q(slug__icontains=query))
         return []
     
     
-    def get_queryset(self):
-        return super().get_queryset().filter(available=True)
+    def get_queryset(self, *args, **kwargs):
+        return super.get_queryset().is_available()
     
 class Products(models.Model):
     name = models.CharField(max_length=50)

@@ -12,14 +12,13 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-class ProductManager(models.Manager):
-
     
-    def search(self, query):
-        if query:
-            return self.filter(Q(name__icontains=query) | Q(slug__icontains=query))
-        return []
+class ProductManager(models.Manager):
+    
+    # def search(self, query):
+    #     if query:
+    #         return self.get_queryset().filter(Q(name__icontains=query) | Q(slug__icontains=query))
+    #     return self.get_queryset()
     
     
     def get_queryset(self):
@@ -40,8 +39,7 @@ class Products(models.Model):
     update = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True)
     
-    objects = models.Manager()
-    available_products = ProductManager()
+    objects = ProductManager()
     
     def __str__(self):
         return self.name
