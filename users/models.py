@@ -1,7 +1,11 @@
+import secrets
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils.translation import gettext as _
 
+from publik.utils import custom_id
+
+# from publik.utils import custom_id
 
 class Address(models.Model):
     state = models.CharField(max_length=100)
@@ -47,6 +51,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ("F","Female"),
         ("O","Other"),
     ]
+    id = models.CharField(primary_key=True, default=custom_id, editable=False, max_length=32, unique=True)
     email = models.EmailField(_("Email Address"), unique=True, max_length=255)
     first_name = models.CharField(_("First name"), max_length=100)
     last_name = models.CharField(_("Last name"), max_length=100)
