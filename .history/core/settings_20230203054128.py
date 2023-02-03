@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     
     # Apps
     "blog.apps.BlogConfig",
-    "lessons.apps.LessonsConfig",
+    "lessons.apps.LessonConfig",
     "products.apps.ProductsConfig",
     "users.apps.UsersConfig",
     

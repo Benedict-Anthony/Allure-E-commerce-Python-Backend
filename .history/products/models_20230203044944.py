@@ -27,7 +27,7 @@ class ProductManager(models.Manager):
         return super().get_queryset().filter(available=True)
     
 class Products(models.Model):
-    id = models.CharField(max_length=30, default=custom_id, primary_key=True, editable=False, unique=True)
+    id = models.CharField(max_length=100, default=custom_id, primary_key=True, editable=False, unique=True)
     name = models.CharField(max_length=50)
     price = models.FloatField()
     discount = models.FloatField(blank=True, null=True)
@@ -108,7 +108,6 @@ class Products(models.Model):
         return self.name
 
 class OrderDetails(models.Model):
-    id = models.CharField(max_length=30, default=custom_id, primary_key=True, editable=False, unique=True)
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     products = models.ForeignKey(Products, on_delete=models.CASCADE)
     address_details = models.ForeignKey(Address, on_delete=models.CASCADE)
