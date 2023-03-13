@@ -1,11 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-from products.models import Category, Products
+from products.models import Category, Order, OrderedItems, Products
 from rest_framework import status
 from django.db.models import Q
-
-from products.serializer import CategorySerializer, ProductSerializer
+from rest_framework import permissions
+from rest_framework import status
+from users.models import Address, CustomUser
+from .permission import OwnerRightOnly
+from products.serializer import (CategorySerializer,  
+                                 OrderSerializer, 
+                                 ProductSerializer)
     
 class ProductListView(APIView):
     serializer_class = ProductSerializer
@@ -42,6 +47,41 @@ class ProductListView(APIView):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class ProductFilterView(APIView):
+    def get(self, category):
+        quaryset = Products.objects.filter(category__name=category)
+        serializer = ProductSerializer(quaryset, many=True).data
+        return Response(serializer)
+        
+        
+class OrderView(APIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated, OwnerRightOnly]
+    def get(self, request):
+        quaryset  = Order.objects.all()
+        serializer = self.serializer_class(quaryset, many=True).data
+        return Response(serializer)
+    
+    def post(self, request):
+        user = request.user
+        data = request.data
+        try:
+            cartItems = data["cartItems"]
+            address = data["address"]
+            transaction_id = data["transaction_id"]
+            address, created = Address.objects.get_or_create(**address)
+            total_price = 0
+            for item in cartItems:
+                product = Products.available_products.get(id=item.get("id"))
+                price = float(item.get("quantity")) * product.product_price
+                total_price += price
+                ordered_item = OrderedItems.objects.create(customer=user, product=product, quantity=item.get("quantity"), price=price, transaction_id=transaction_id)
+                order = Order.objects.create(customer=user, order=ordered_item, address=address, total_price=total_price)
+                order.save()
+            return Response({"message":"Your order has been taken.."}, status=status.HTTP_201_CREATED) 
+        except Exception as exec:
+            return Response({"msg":str(exec)})
+
 
 class CategoryListView(ListAPIView):
     serializer_class = CategorySerializer

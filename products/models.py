@@ -15,8 +15,6 @@ class Category(models.Model):
         return self.name
 
 class ProductManager(models.Manager):
-
-    
     def search(self, query):
         if query:
             return self.filter(Q(name__icontains=query) | Q(slug__icontains=query))
@@ -35,12 +33,15 @@ class Products(models.Model):
     thumbnail = models.ImageField(upload_to="thumbnails", default="", blank=True, null=True)
     percent = models.FloatField(null=True, blank=True)
     description = models.TextField(max_length=400)
+    size = models.CharField(max_length=15,  blank=True, null=True)
     rating =models.IntegerField(default=1, blank=True, null=True)
     category =  models.ForeignKey(Category, blank=True, on_delete=models.SET_NULL,null=True )
+    available = models.BooleanField(default=True)
+    notify = models.BooleanField(default=False)
+    notified = models.BooleanField(default=False)
     slug = models.SlugField(blank=True, null=True, default="", unique=True)
     created = models.DateTimeField(auto_now_add=True)
     update = models.DateTimeField(auto_now=True)
-    available = models.BooleanField(default=True)
     
     objects = models.Manager()
     available_products = ProductManager()
@@ -104,16 +105,40 @@ class Products(models.Model):
         ordering =("-created",)
    
     
-    def __str__(self):
-        return self.name
 
-class OrderDetails(models.Model):
+
+class OrderedItems(models.Model):
+    id = models.CharField(max_length=30, default=custom_id, primary_key=True, editable=False, unique=True)
+    customer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Products, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+    price = models.IntegerField()
+    transaction_id = models.CharField(max_length=100)
+    date = models.DateField(auto_now=True)
+    
+    class Meta:
+        verbose_name_plural = "Ordered Item"
+
+
+    def __str__(self):
+        return self.product.name
+
+class Order(models.Model):
+    status = (
+        ("pending", "pending"),
+        ("sent", "sent"),
+        ("delivered", "delivered")
+    )
     id = models.CharField(max_length=30, default=custom_id, primary_key=True, editable=False, unique=True)
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    products = models.ForeignKey(Products, on_delete=models.CASCADE)
-    address_details = models.ForeignKey(Address, on_delete=models.CASCADE)
-    total_price = models.DecimalField(max_digits=4, decimal_places=2)
+    order = models.ForeignKey(OrderedItems, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    total_price = models.IntegerField()
+    status = models.CharField(choices=status, default="pending", max_length=15)
+    complete = models.BooleanField(default=False)
+    date = models.DateField(auto_now=True)
+    
     
     
     class Meta:
-        verbose_name_plural = "Order Items Details"
+        verbose_name_plural = "Orders"

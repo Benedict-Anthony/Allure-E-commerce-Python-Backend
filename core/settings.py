@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from datetime import timedelta
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3vv*&t6(ifa3mq7yqpsju08l*6*)v(jk&dav_tt4yhwu+x9dhy'
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,17 +42,17 @@ INSTALLED_APPS = [
     
     # Apps
     "blog.apps.BlogConfig",
-    "lessons.apps.LessonsConfig",
     "products.apps.ProductsConfig",
     "users.apps.UsersConfig",
+    "services.apps.ServicesConfig",
     
     # Packeges
     "corsheaders",
     "rest_framework",
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     
-    'oauth2_provider',
-    'social_django',
-    'drf_social_oauth2',
 ]
 
 MIDDLEWARE = [
@@ -121,10 +123,11 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     
-        # 'oauth2_provider.ext.rest_framework.OAuth2Authentication',  # django-oauth-toolkit < 1.0.0
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
-        'drf_social_oauth2.authentication.SocialAuthentication',
     ),
     
     'DEFAULT_PERMISSION_CLASSES': [
@@ -134,50 +137,22 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
 
+
 AUTHENTICATION_BACKENDS = (
-    
-    
-     # Facebook OAuth2
-    'social_core.backends.facebook.FacebookAppOAuth2',
-    'social_core.backends.facebook.FacebookOAuth2',
-
-
-    # Google OAuth2
-    'social_core.backends.google.GoogleOAuth2',
-    
-    # drf_social_oauth2
-    'drf_social_oauth2.backends.DjangoOAuth2',
-
-    # Django
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 )
 
 
 
-# Facebook configuration
-SOCIAL_AUTH_FACEBOOK_KEY = '<your app id goes here>'
-SOCIAL_AUTH_FACEBOOK_SECRET = '<your app secret goes here>'
-
-# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from Facebook.
-# Email is not sent by default, to get it, you must request the email permission.
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
-SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
-    'fields': 'id, name, email'
-}
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY =" <your app id goes here>"
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "<your app secret goes here>"
-
-# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-]
-
-
 CORS_ALLOW_ALL_ORIGINS = True 
 
-
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=105),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+    }
 AUTH_USER_MODEL = "users.CustomUser"
 
 # Internationalization

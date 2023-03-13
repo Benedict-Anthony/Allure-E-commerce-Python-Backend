@@ -1,6 +1,7 @@
-
 from rest_framework import serializers
-from products.models import Category, Products
+from products.models import Category, Order, OrderedItems, Products
+from users.models import CustomUser
+from users.serializer import AddressSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -33,9 +34,42 @@ class ProductSerializer(serializers.ModelSerializer):
                   "product_price",
                   "product_discount",
                   "disc_perc",
+                  "size",
                   "thumbnail_url",
                   "image_url", 
                   "slug",
                   "category",
                 #   "assets"
                   ]
+        
+        
+# OERDER SERIALIZERS
+
+class OrderedProduct(serializers.ModelSerializer):
+    class Meta:
+        model = Products
+        fields = ["id", "name", "product_price"]
+class OrderItemsSerializer(serializers.ModelSerializer):
+    product = OrderedProduct()
+    class Meta:
+        model = OrderedItems
+        # fields = "__all__"
+        exclude =  ["id"]
+        
+        
+class UserOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [ "email", "name"]
+
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order = OrderItemsSerializer()
+    address = AddressSerializer()
+    class Meta:
+        model = Order
+        fields = "__all__"
+    
+

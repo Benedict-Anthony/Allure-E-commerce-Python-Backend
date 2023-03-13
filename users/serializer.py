@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from users.models import CustomUser
+from users.models import CustomUser, Address, UserProfile
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -11,7 +11,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
            "email",
            "password",
            "phone",
-           "gender"
+        #    "gender"
         ]
         
     def create(self, validated_data):
@@ -31,3 +31,46 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address 
+        exclude =  ["id"]
+
+
+
+        
+    
+    
+    
+class UserProfileCreateSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+    class Meta:
+        model = UserProfile
+        exclude =  ["user"]
+        
+    def create(self, validated_data):
+        address = validated_data.pop("address")
+        instance = Address.objects.create(**address)
+        user_profile = UserProfile.objects.create(**validated_data, address=instance)
+        user_profile.save()
+        return user_profile
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["name", "email", "first_name", "last_name","phone"]
+class UserProfileSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+    user = UserSerializer()
+    class Meta:
+        model = UserProfile
+        fields =  ["user", "address", "avatar"]
+
+
+class GoogleAuthSerialiazer(serializers.Serializer):
+    family_name = serializers.CharField()
+    given_name = serializers.CharField()
+    email = serializers.EmailField()
+    sub = serializers.CharField()

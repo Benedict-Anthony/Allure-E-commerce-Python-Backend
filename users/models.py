@@ -13,13 +13,18 @@ class Address(models.Model):
     town = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
     description = models.TextField(max_length=100)
+    
+    
+    def __str__(self):
+        return f"{self.state} - {self.city}"
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
         if not email:
            raise ValueError(_("email can not be None"))
-        if not password:
-            raise ValueError(_("password can not be None"))
+        # if not password:
+        #     raise ValueError(_("password can not be None"))
+        # kwargs.setdefault("is_active", True)
         
         email = self.normalize_email(email=email)
         user = self.model(email=email, **kwargs)
@@ -56,19 +61,29 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_("First name"), max_length=100)
     last_name = models.CharField(_("Last name"), max_length=100)
     gender = models.CharField(_("Gender"), max_length=20, choices=gender)
-    phone = models.IntegerField()
+    phone = models.IntegerField(null=True, blank=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     
     objects = CustomUserManager()
     
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "phone"]
+    REQUIRED_FIELDS = ["first_name", "last_name",]
+    
+    class Meta:
+        verbose_name_plural = "Users"
+    
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
     
     
 class UserProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="user_profile")
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
     avatar = models.ImageField(null=True, blank=True, upload_to="profile")
     

@@ -13,7 +13,7 @@ def user_token(payload):
 
 def decode_token(token):
     try:
-        token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256",])
         return token
     except Exception as exec:
         return None

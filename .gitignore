@@ -1,9 +1,11 @@
-env
+.env
 env/
 *__pycache__.py
 db.sqlite3
 uploads
-
+/.history
+*.history/
+*__pycache__/
 
 *.log
 *.pot
