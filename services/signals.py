@@ -17,6 +17,7 @@ def send_booking_email(sender, instance, created, **kwargs):
         
         Thank you for choosing us
         
+        Allure
         """
         send_mail(email=email, subject=subject, body=body)
         

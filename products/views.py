@@ -6,11 +6,12 @@ from rest_framework import status
 from django.db.models import Q
 from rest_framework import permissions
 from rest_framework import status
-from users.models import Address, CustomUser
+from users.models import Address
 from .permission import OwnerRightOnly
 from products.serializer import (CategorySerializer,  
                                  OrderSerializer, 
                                  ProductSerializer)
+from users.email import send_mail
     
 class ProductListView(APIView):
     serializer_class = ProductSerializer
@@ -65,6 +66,16 @@ class OrderView(APIView):
     def post(self, request):
         user = request.user
         data = request.data
+        subject = "Allure Order Confirmation"
+        body = f"""
+        `   Hi {user.first_name},
+            Your orders has been taken. 
+            We will contact you soon about the delivery processes.
+            
+            Thank you for shopping with us.
+            
+            Allure.
+                 """
         try:
             cartItems = data["cartItems"]
             address = data["address"]
@@ -78,6 +89,7 @@ class OrderView(APIView):
                 ordered_item = OrderedItems.objects.create(customer=user, product=product, quantity=item.get("quantity"), price=price, transaction_id=transaction_id)
                 order = Order.objects.create(customer=user, order=ordered_item, address=address, total_price=total_price)
                 order.save()
+            send_mail(user.email, subject, body)
             return Response({"message":"Your order has been taken.."}, status=status.HTTP_201_CREATED) 
         except Exception as exec:
             return Response({"msg":str(exec)})

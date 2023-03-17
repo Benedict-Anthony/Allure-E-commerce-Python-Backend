@@ -20,7 +20,6 @@ class Service(models.Model):
     id = models.CharField(max_length=100, primary_key=True, default=custom_id, editable=False)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    price = models.FloatField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="services")
     image = models.ImageField(upload_to="services")
     slug = models.SlugField(unique=True, max_length=100)
@@ -35,6 +34,7 @@ class Bookings(models.Model):
     date = models.DateField()
     location = models.CharField(max_length=255)
     status = models.CharField(max_length=100, choices=[("pending", "pending"), ("completed", "completed"), ("cancelled", "cancelled")], default="pending")
+    description = models.TextField()
     
     
     class Meta:

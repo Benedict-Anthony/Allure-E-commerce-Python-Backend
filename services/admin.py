@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Category, Service, Bookings
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ["name", "price", "category"]
+    list_display = ["name", "category"]
     list_filter = ["category"]
     prepopulated_fields = {"slug": ("name",)}
     

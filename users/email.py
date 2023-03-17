@@ -8,7 +8,7 @@ def send_mail(email, subject, body):
     sender = config("SENDER_EMAIL")
     password = config("SENDER_PASSWORD")
     message = MIMEMultipart()
-    message["from"] = config("SENDER_EMAIL")
+    message["from"] = "Allure "
     message["to"] = email
     message["subject"] = subject
     message.attach(MIMEText(body, "plain"))

@@ -131,7 +131,7 @@ class Order(models.Model):
     )
     id = models.CharField(max_length=30, default=custom_id, primary_key=True, editable=False, unique=True)
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    order = models.ForeignKey(OrderedItems, on_delete=models.CASCADE)
+    order = models.ForeignKey(OrderedItems, on_delete=models.CASCADE, related_name="orders")
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
     total_price = models.IntegerField()
     status = models.CharField(choices=status, default="pending", max_length=15)

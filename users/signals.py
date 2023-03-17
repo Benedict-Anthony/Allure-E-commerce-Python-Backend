@@ -17,9 +17,11 @@ def pre_save_user(sender, instance, created,  **kwargs):
         
         Thanks for creating an account with allure\n\n
         
-        To confirm your account, please click on the link below:\n\n
+        To activate your account, please click on the link below:\n\n
         
         http://localhost:3000/comfirm/{token}\n\n
+        
+        Allure
         
         """
         

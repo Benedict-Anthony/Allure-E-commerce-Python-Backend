@@ -48,13 +48,13 @@ class ProductSerializer(serializers.ModelSerializer):
 class OrderedProduct(serializers.ModelSerializer):
     class Meta:
         model = Products
-        fields = ["id", "name", "product_price"]
+        fields = ["id", "name", "product_price", "image_url"]
 class OrderItemsSerializer(serializers.ModelSerializer):
     product = OrderedProduct()
     class Meta:
         model = OrderedItems
-        # fields = "__all__"
-        exclude =  ["id"]
+        fields =["id", "customer", "product","quantity","price", "transaction_id",  ]
+        # exclude =  ["id"]
         
         
 class UserOrderSerializer(serializers.ModelSerializer):

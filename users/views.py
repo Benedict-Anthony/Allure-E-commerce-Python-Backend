@@ -66,18 +66,18 @@ class UserAccountView(APIView):
             serializer = self.serializer_class(profile).data
             return Response(serializer)
        except UserProfile.DoesNotExist:
-           return Response({"msg": "you don't have a profile. Consider creating one"}, status=status.HTTP_404_NOT_FOUND)
+           return Response({"data":None})
        
        
        return Response({"msg":"error"})
    
     def post(self, request):
         serializer = UserProfileCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data)
         
-        return Response(serializer.errors)
+     
 
 
 

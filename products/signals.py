@@ -8,7 +8,7 @@ from users.models import CustomUser
 @receiver(post_save, sender=Products)
 def nofity_users(sender, instance, created, **kwargs):
     if instance.notify:
-        subject = f"New Product Added- {instance.name}"
+        subject = f"New Product Added - {instance.name}"
         body = f"""
         Hi there,
         
