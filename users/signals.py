@@ -13,12 +13,8 @@ def pre_save_user(sender, instance, created,  **kwargs):
         subject = "Allure Account Confirmation"
         email = instance.email
         body = f"""Hello {instance.first_name} {instance.last_name}, 
-        
-        
         Thanks for creating an account with allure\n\n
-        
         To activate your account, please click on the link below:\n\n
-        
         http://localhost:3000/comfirm/{token}\n\n
         
         Allure
