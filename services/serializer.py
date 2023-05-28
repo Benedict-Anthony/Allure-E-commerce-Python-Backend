@@ -6,7 +6,7 @@ from .models import Category, Service, Bookings
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ["id", "name", "description", "price",  "image", "slug"]
+        fields = ["id", "name", "description",  "image", "slug"]
  
  
  

@@ -1,7 +1,7 @@
 from django.db import models
 from publik.utils import custom_id
 from users.models import CustomUser
-
+from django.utils.text import slugify
 
 class Category(models.Model):
     id = models.CharField(max_length=100, primary_key=True, default=custom_id, editable=False)
@@ -35,6 +35,11 @@ class Bookings(models.Model):
     location = models.CharField(max_length=255)
     status = models.CharField(max_length=100, choices=[("pending", "pending"), ("completed", "completed"), ("cancelled", "cancelled")], default="pending")
     description = models.TextField()
+    slug = models.SlugField(max_length=100)
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(f"{self.service.name}-{self.id}")
+        return super().save(*args, **kwargs)
     
     
     class Meta:

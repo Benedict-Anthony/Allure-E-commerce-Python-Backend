@@ -36,31 +36,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address 
-        exclude =  ["id"]
-
-
-
-        
+        fields = "__all__"
     
-    
-    
-class UserProfileCreateSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()
-    class Meta:
-        model = UserProfile
-        exclude =  ["user"]
-        
-    def create(self, validated_data):
-        address = validated_data.pop("address")
-        instance = Address.objects.create(**address)
-        user_profile = UserProfile.objects.create(**validated_data, address=instance)
-        user_profile.save()
-        return user_profile
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["name", "email", "first_name", "last_name","phone"]
+        
 class UserProfileSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     user = UserSerializer()

@@ -59,7 +59,7 @@ class OrderView(APIView):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated, OwnerRightOnly]
     def get(self, request):
-        quaryset  = Order.objects.all()
+        quaryset  = Order.objects.filter(customer=request.user)
         serializer = self.serializer_class(quaryset, many=True).data
         return Response(serializer)
     
@@ -72,22 +72,23 @@ class OrderView(APIView):
             Your orders has been taken. 
             We will contact you soon about the delivery processes.
             
-            Thank you for shopping with us.
+            Please Note that delivery could take up to 24 to 48 hours!
+             
+            Thank you for shopping with us!!!
             
             Allure.
-                 """
+            """
         try:
             cartItems = data["cartItems"]
             address = data["address"]
             transaction_id = data["transaction_id"]
             address, created = Address.objects.get_or_create(**address)
-            total_price = 0
             for item in cartItems:
                 product = Products.available_products.get(id=item.get("id"))
                 price = float(item.get("quantity")) * product.product_price
-                total_price += price
+               
                 ordered_item = OrderedItems.objects.create(customer=user, product=product, quantity=item.get("quantity"), price=price, transaction_id=transaction_id)
-                order = Order.objects.create(customer=user, order=ordered_item, address=address, total_price=total_price)
+                order = Order.objects.create(customer=user, order=ordered_item, address=address, total_price=price)
                 order.save()
             send_mail(user.email, subject, body)
             return Response({"message":"Your order has been taken.."}, status=status.HTTP_201_CREATED) 
@@ -103,4 +104,3 @@ class CategoryListView(ListAPIView):
         queryset = Category.objects.all().order_by("-id")
         
         return queryset
-# Create your views here.

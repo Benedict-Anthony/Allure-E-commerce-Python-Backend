@@ -1,4 +1,4 @@
-from services.views import ServiceCategoryView, BookServiceView
+from services.views import BookServiceUpdateView, ServiceCategoryView, BookServiceView
 from users import views
 from django.urls import path
 
@@ -31,7 +31,8 @@ urlpatterns = [
     path("product/filter/<str:category>/", ProductFilterView.as_view()),
     
     path("services/", ServiceCategoryView.as_view()),
-    path("services/book/", BookServiceView.as_view()),
+    path("user/bookings/", BookServiceView.as_view()),
+    path("user/bookings/<slug:slug>/update/", BookServiceUpdateView.as_view()),
     path("services/<slug:slug>/", ServiceCategoryView.as_view()),
     path("services/<slug:slug>/<slug:book>/", ServiceCategoryView.as_view()),
 ] 

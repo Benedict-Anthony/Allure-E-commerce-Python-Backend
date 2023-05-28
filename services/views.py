@@ -19,6 +19,8 @@ class ServiceCategoryView(APIView):
         quaryset = Category.objects.all()
         serializer = self.serializer_class(quaryset, many=True).data
         return Response(serializer)
+    
+
 
 
 class BookServiceView(APIView):
@@ -32,8 +34,30 @@ class BookServiceView(APIView):
         return Response(serializer)
     
     def post(self, request):
-        user = request.user
-        serializer = BookingCreateSerializer(data=request.data)
+        try:
+    
+            user = request.user
+            serializer = BookingCreateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=user)
+            return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            return Response({"msg": str(e)})
+   
+class BookServiceUpdateView(APIView):
+    serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def put(self, request, slug):
+        book_instance = request.user.bookings_set.get(slug=slug)
+        serializer = BookingCreateSerializer(data=request.data, instance=book_instance)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
-        return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
+        serializer.save()
+        return Response(serializer.data)
+    
+    def delete(self, request, slug):
+        book_instance = request.user.bookings_set.get(slug=slug)
+        book_instance.delete()
+        return Response({"msg":"deleted"}, status=status.HTTP_204_NO_CONTENT)
+    

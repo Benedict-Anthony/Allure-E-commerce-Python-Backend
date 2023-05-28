@@ -6,33 +6,44 @@ from rest_framework import permissions
 from django.http import HttpResponse
 from users.models import CustomUser, UserProfile
 from .token import decode_token
-
-from users.serializer import GoogleAuthSerialiazer, UserCreateSerializer, UserProfileCreateSerializer, UserProfileSerializer
+from rest_framework.parsers import FormParser, MultiPartParser
+from users.serializer import (AddressSerializer,
+                              GoogleAuthSerialiazer, 
+                              UserCreateSerializer, 
+                              UserProfileSerializer)
 
 
 class UserCreateView(APIView):
     serializer_class = UserCreateSerializer
     permission_classes = [permissions.AllowAny]
-    
+    user_profile = UserProfile()
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            # serializer.is_active = False
            user = serializer.save()
            user.is_active = False
            user.save()
+           self.user_profile.user = user
+           self.user_profile.save()
 
-            
         except Exception as exec:
             return Response({"error":str(exec)})
        
         return Response({"msg":"success"}, status=status.HTTP_201_CREATED)
     
+    def patch(self, request):
+        user = CustomUser.objects.get(id=request.user.id)
+        serializer = self.serializer_class(data=request.data, instance=user, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data) 
+       
+            
+    
 
 class ConfirmAccount(APIView):
     permission_classes = [permissions.AllowAny]
-    
     def get(self, request, *args, **kwargs):
         return Response({"msg":"Please activate your account before login in"})
     
@@ -57,7 +68,8 @@ class ConfirmAccount(APIView):
 
 
 class UserAccountView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated] 
+    parser_classes = [MultiPartParser, FormParser ]
     serializer_class = UserProfileSerializer
     def get(self, request):
        user = request.user
@@ -68,24 +80,48 @@ class UserAccountView(APIView):
        except UserProfile.DoesNotExist:
            return Response({"data":None})
        
-       
-       return Response({"msg":"error"})
+    
    
     def post(self, request):
-        serializer = UserProfileCreateSerializer(data=request.data)
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        serializer = AddressSerializer(data=request.data)
+        if serializer.is_valid():
+            address = serializer.save()
+            profile.address = address
+            profile.save()
+            serializer = self.serializer_class(profile)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request):
+        user = request.user
+        address = UserProfile.objects.get(user=user).address
+        serializer = AddressSerializer(data=request.data, instance=address)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
-        return Response(serializer.data)
-        
+        serializer.save()
+        return Response(serializer.data) 
+         
+    
+    def patch(self, request):
+        try:
+            user = request.user
+            profile = UserProfile.objects.get(user=user)
+            serializer = self.serializer_class(data=request.data, instance=profile, partial=True)
+            serializer.is_valid(raise_exception=True) 
+            serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"msg": str(e)})
      
 
 
-
-            
+          
 
 class GoogleAuth(APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = GoogleAuthSerialiazer
+    user_profile = UserProfile()
     def post(self, request):
        serializer = self.serializer_class(data=request.data)
        try:
@@ -101,6 +137,8 @@ class GoogleAuth(APIView):
                     user = CustomUser.objects.create(email=serializer.data.get("email"), first_name=serializer.data.get("given_name"), last_name=serializer.data.get("family_name"))
                     user.set_password(serializer.data.get("sub"))
                     user.save()
+                    self.user_profile.user = user
+                    self.user_profile.save()
                     return Response({"msg":"user created"}, status=status.HTTP_201_CREATED)
        except Exception as exec:
             print(str(exec))
