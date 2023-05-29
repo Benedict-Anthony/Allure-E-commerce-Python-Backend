@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from .models import Products
 from users.email import send_mail
@@ -27,4 +27,7 @@ def nofity_users(sender, instance, created, **kwargs):
         for users in CustomUser.objects.all():
             send_mail(email=users.email, subject=subject, body=body)
             
-   
+@receiver(pre_save, sender=Products)
+def make_thumbnail(sender, instance, **kwargs):
+    instance.thumbnail = instance.image
+    return instance

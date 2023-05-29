@@ -13,6 +13,7 @@ from datetime import timedelta
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,6 +54,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
+
+    'cloudinary_storage',
+    'cloudinary',
     
 ]
 
@@ -99,6 +103,12 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': dj_database_url.parse(config("DATABASE_URL"))
+        
+
+# }
+
 
 
 # Password validation
@@ -155,6 +165,15 @@ AUTHENTICATION_BACKENDS = (
 
 
 CORS_ALLOW_ALL_ORIGINS = True 
+
+## CLOUDINARY SET UP
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config("CLOUDINARY_NAME"),
+    'API_KEY': config("CLOUDINARY_KEY"),
+    'API_SECRET': config("CLOUDINARY_SECRET")
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
