@@ -15,7 +15,7 @@ def pre_save_user(sender, instance, created, **kwargs):
         body = f"""Hello {instance.first_name} {instance.last_name}, 
         Thanks for creating an account with allure\n\n
         To activate your account, please click on the link below:\n\n
-        https://allures.vercel.app//comfirm/{token}\n\n
+        https://allures.vercel.app/comfirm/{token}\n\n
         
         Allure
         
