@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Products
 from users.email import send_mail
 from users.models import CustomUser
+from blog.models import Post
 
 
 @receiver(post_save, sender=Products)
@@ -14,7 +15,7 @@ def nofity_users(sender, instance, created, **kwargs):
         
         Check out our new product {instance.name} at {instance.price} 
         
-        https://localhost:3000/products/{instance.slug}/
+        https://allures.vercel.app/products/{instance.slug}/
         
         Trust Allure, it's amazing and you will love it.
         
@@ -26,8 +27,15 @@ def nofity_users(sender, instance, created, **kwargs):
         instance.save()
         for users in CustomUser.objects.all():
             send_mail(email=users.email, subject=subject, body=body)
-            
+
+
 @receiver(pre_save, sender=Products)
+def make_thumbnail(sender, instance, **kwargs):
+    instance.thumbnail = instance.image
+    return instance
+
+
+@receiver(pre_save, sender=Post)
 def make_thumbnail(sender, instance, **kwargs):
     instance.thumbnail = instance.image
     return instance
