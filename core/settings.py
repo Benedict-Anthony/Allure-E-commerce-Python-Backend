@@ -150,7 +150,7 @@ AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-## CLOUDINARY SET UP
+# CLOUDINARY SET UP
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": config("CLOUDINARY_NAME"),
     "API_KEY": config("CLOUDINARY_KEY"),
